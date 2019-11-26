@@ -6,6 +6,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.IO;
 
+//Text Diver by Joshua Feiger.
+
 namespace Text_Diver
 {
     class Program
