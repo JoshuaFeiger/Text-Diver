@@ -34,29 +34,100 @@ namespace Text_Diver
                 }
             }
 
-            //Directory.CreateDirectory("Content");
-            //Directory.CreateDirectory("Content\\Levels");
-            //File.WriteAllText("Content\\Levels\\TextFile1.txt", "Hello");
-
+            //Set the title bar's text to "Console Diver"
             Console.Title = "Console Diver";
+            DisplayTitleScreen();
             PlayLevel();
         }
 
+        static void DisplayTitleScreen()
+        {
+            Console.WriteLine(
+                "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO" + "\n" +
+                "O                                                                                                 O" + "\n" +
+                "O                                                                                                 O" + "\n" +
+                "O                                                                                                 O" + "\n" +
+                "O                                                                                                 O" + "\n" +
+                "O                 ###                           #                                                 O" + "\n" +
+                "O                #      ###   ###   ###  ###    #    ####                                         O" + "\n" +
+                "O                #     #   #  #  # ##   #   #   #   #   #                                         O" + "\n" +
+                "O                #     #   #  #  #   ## #   #   #   #                                             O" + "\n" +
+                "O                 ###   ###   #  # ###   ###   ###   ###                                          O" + "\n" +
+                "O                                                                                                 O" + "\n" +
+                "O                       #######  ######## #      # ######   #######                               O" + "\n" +
+                "O                       #      #    #     #      # #        #      #                              O" + "\n" +
+                "O                       #      #    #     #      # ####     #######                               O" + "\n" +
+                "O                       #      #    #      #    #  #        #      #                              O" + "\n" +
+                "O                       #      #    #       #  #   #        #      #                              O" + "\n" +
+                "O                       #######  ########    ##    ######## #      #                              O" + "\n" +
+                "O                                                                                                 O" + "\n" +
+                "O                                                                                                 O" + "\n" +
+                "O                                                                                                 O" + "\n" +
+                "O                                                                                                 O" + "\n" +
+                "O                                                                                                 O" + "\n" +
+                "O                                                                                                 O" + "\n" +
+                "O                                                                                                 O" + "\n" +
+                "O                                                                                                 O" + "\n" +
+                "O                                                                                                 O" + "\n" +
+                "O                                                                                                 O" + "\n" +
+                "O                     Controls:                                                                   O" + "\n" +
+                "O                     J: steer left                                                               O" + "\n" +
+                "O                     L: steer right                                                              O" + "\n" +
+                "O                     K: slide cancel                                                             O" + "\n" +
+                "O                                                                                                 O" + "\n" +
+                "O                                                                                                 O" + "\n" +
+                "O                                                                                                 O" + "\n" +
+                "O                                                                                                 O" + "\n" +
+                "O                     Press a key to begin!                                                       O" + "\n" +
+                "O                                                                                                 O" + "\n" +
+                "O                                                                                                 O" + "\n" +
+                "O                                                                                                 O" + "\n" +
+                "O                                                                                                 O" + "\n" +
+                "O                                                                                                 O" + "\n" +
+                "O                                                                                                 O" + "\n" +
+                "O                                                                                                 O" + "\n" +
+                "O                                                                                                 O" + "\n" +
+                "O                                                                                                 O" + "\n" +
+                "O                                                                                                 O" + "\n" +
+                "O                                                                                                 O" + "\n" +
+                "O                                                                                                 O" + "\n" +
+                "O                                                                                                 O" + "\n" +
+                "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
+            Console.SetCursorPosition(0, 0);
+            Console.SetCursorPosition(43, 35);
+            Console.ReadKey(true);
+        }
+
+        /// <summary>
+        /// Play a level.
+        /// </summary>
         static void PlayLevel()
         {
+            //Initialize several variables.
+
+            //WriteY is the area of the level being written to the screen-- it's always the line at the bottom of the screen.
             int WriteY = 0;
+            //PlayerY is the Y position of the player-- it's usually always going to be 26 rows above the WriteY row.
+            //PlayerX is the column the player is on.
             int PlayerY = -26;
             int PlayerX = 50;
+
+            //The FramesSince(key)Pressed variables are used to determine when the slide state should end.
             int FramesSinceJPressed = 100;
             int FramesSinceLPressed = 100;
 
+            //"Level" is created as a string array to load the level in in its original state, but the slightly more versatile "LevelList" is what will be used by the program.
             string[] Level;
             Level = File.ReadAllLines("Content\\Levels\\TextFile1.txt");
             List<string> LevelList = Level.ToList();
 
+            //A few variables for inputs are included. 
+            //KeyPressed is used to determine what key has most recently been reacted to by the console, 
+            //while InputBuffer stores some input that might otherwise get ignored accidentally.
             ConsoleKeyInfo KeyPressed;
             List<ConsoleKeyInfo> InputBuffer = new List<ConsoleKeyInfo>();
 
+            //Clear the console and initialize one more variable, Line-- the line that will be written to the screen.
             Console.Clear();
             string Line = LevelList[WriteY];
             while (!(WriteY >= LevelList.Count()))
@@ -90,7 +161,7 @@ namespace Text_Diver
                     {
                         KeyPressed = Console.ReadKey(true);
                     }
-                    
+
                     switch (KeyPressed.Key)
                     {
                         case ConsoleKey.I:

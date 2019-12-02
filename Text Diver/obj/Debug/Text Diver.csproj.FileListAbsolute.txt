@@ -16,6 +16,5 @@ D:\__Joshua Feiger's SD Card data\_CIT 110\__Final Project\Text Diver\Text Diver
 D:\__Joshua Feiger's SD Card data\_CIT 110\__Final Project\Text Diver\Text Diver\bin\Debug\Text Diver.exe
 D:\__Joshua Feiger's SD Card data\_CIT 110\__Final Project\Text Diver\Text Diver\bin\Debug\Text Diver.pdb
 D:\__Joshua Feiger's SD Card data\_CIT 110\__Final Project\Text Diver\Text Diver\obj\Debug\Text Diver.csprojAssemblyReference.cache
-D:\__Joshua Feiger's SD Card data\_CIT 110\__Final Project\Text Diver\Text Diver\obj\Debug\Text Diver.csproj.CoreCompileInputs.cache
 D:\__Joshua Feiger's SD Card data\_CIT 110\__Final Project\Text Diver\Text Diver\obj\Debug\Text Diver.exe
 D:\__Joshua Feiger's SD Card data\_CIT 110\__Final Project\Text Diver\Text Diver\obj\Debug\Text Diver.pdb
