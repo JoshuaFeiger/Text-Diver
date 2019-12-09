@@ -98,7 +98,7 @@ namespace Text_Diver
                 "O                     J: steer left                                                               O" + "\n" +
                 "O                     L: steer right                                                              O" + "\n" +
                 "O                     K: slide cancel                                                             O" + "\n" +
-                "O                                                                                                 O" + "\n" +
+                "O                     Z/X: activate/deactivate faster falling                                     O" + "\n" +
                 "O                                                                                                 O" + "\n" +
                 "O                                                                                                 O" + "\n" +
                 "O                                                                                                 O" + "\n" +
