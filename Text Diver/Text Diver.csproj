@@ -53,6 +53,7 @@
     <Content Include="bin\Debug\SaveData\HighScores\Level_1.txt" />
     <Content Include="bin\Debug\SaveData\HighScores\Level_2.txt" />
     <Content Include="bin\Debug\SaveData\HighScores\TextFile1.txt" />
+    <Content Include="Content\Levels\Level_1.txt" />
     <Content Include="Content\Levels\TextFile1.txt" />
     <Content Include="SaveData\HighScores\Level_2.txt" />
     <Content Include="SaveData\HighScores\Level_1.txt" />
