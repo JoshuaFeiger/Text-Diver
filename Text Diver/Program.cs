@@ -36,12 +36,36 @@ namespace Text_Diver
 
             //Set the title bar's text to "Console Diver"
             Console.Title = "Console Diver";
-            DisplayTitleScreen();
-            PlayLevel();
+
+            int Level = 1;
+            while (Level == 1)
+            {
+                DisplayTitleScreen();
+                if (PlayLevel("Level_1.txt"))
+                {
+                    Level += 1;
+                }
+            }
+            while (Level == 2)
+            {
+                DisplayTitleScreen();
+                if (PlayLevel("Level_2.txt"))
+                {
+                    Level += 1;
+                }
+            }
+            Console.Clear();
+            Console.WriteLine();
+            Console.WriteLine("Thank you for playing Console Diver!");
+            Console.WriteLine("     -Joshua Feiger");
+            Console.WriteLine();
+            DisplayContinueScreen("Press any key to exit.");
+            
         }
 
         static void DisplayTitleScreen()
         {
+            Console.Clear();
             Console.WriteLine(
                 "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO" + "\n" +
                 "O                                                                                                 O" + "\n" +
@@ -101,7 +125,7 @@ namespace Text_Diver
         /// <summary>
         /// Play a level.
         /// </summary>
-        static void PlayLevel()
+        static bool PlayLevel(string LevelName)
         {
             //Initialize several variables.
 
@@ -109,8 +133,16 @@ namespace Text_Diver
             int WriteY = 0;
             //PlayerY is the Y position of the player-- it's usually always going to be 26 rows above the WriteY row.
             //PlayerX is the column the player is on.
-            int PlayerY = -26;
+            int PlayerY = -35;
             int PlayerX = 50;
+
+            int PastPlayerX = 50;
+            int Speed = 50;
+            int MovementSpeed = 1;
+
+            bool IsBoosting = false;
+
+            double TimeTaken = 0;
 
             //The FramesSince(key)Pressed variables are used to determine when the slide state should end.
             int FramesSinceJPressed = 100;
@@ -118,7 +150,7 @@ namespace Text_Diver
 
             //"Level" is created as a string array to load the level in in its original state, but the slightly more versatile "LevelList" is what will be used by the program.
             string[] Level;
-            Level = File.ReadAllLines("Content\\Levels\\TextFile1.txt");
+            Level = File.ReadAllLines("Content\\Levels\\" + LevelName);
             List<string> LevelList = Level.ToList();
 
             //A few variables for inputs are included. 
@@ -130,8 +162,12 @@ namespace Text_Diver
             //Clear the console and initialize one more variable, Line-- the line that will be written to the screen.
             Console.Clear();
             string Line = LevelList[WriteY];
-            while (!(WriteY >= LevelList.Count()))
+            bool LevelCompleted = false;
+            while (!(WriteY >= LevelList.Count()) && !LevelCompleted)
             {
+                Console.SetWindowSize(100, 50);
+                Console.SetBufferSize(100, 9999);
+
                 Line = LevelList[WriteY];
                 WriteY += 1;
                 PlayerY += 1;
@@ -142,13 +178,44 @@ namespace Text_Diver
                 Console.SetCursorPosition(0, WriteY - 1);
                 Console.WriteLine(Line);
 
+                
+
                 if (PlayerY > -1)
                 {
+                    if (IsCollisionObjectOn(PlayerX, PlayerY, LevelList))
+                    {
+                        GameOverScreen(WriteY);
+                        break;
+                    }
+                    else if (IsCharOn(PlayerX, PlayerY, LevelList, '+'))
+                    {
+                        Speed += 2;
+                    }
+                    else if (IsCharOn(PlayerX, PlayerY, LevelList, 'U'))
+                    {
+                        LevelComplete(WriteY, LevelName, TimeTaken);
+                        LevelCompleted = true;
+                        break;
+                    }
                     Console.SetCursorPosition(PlayerX, PlayerY);
                     Console.Write("@");
                 }
 
-                PlayerX = SlideCode(2, 10, FramesSinceJPressed, FramesSinceLPressed, PlayerX, PlayerY, LevelList);
+                if (PlayerY > 0)
+                {
+                    DrawPlayerTrail(PlayerX, PlayerY, PastPlayerX);
+                }
+
+                PastPlayerX = PlayerX;
+
+                if (MovementSpeed == 1)
+                {
+                    PlayerX = SlideCode(2, Convert.ToInt32(Convert.ToDouble(Speed) - 40), FramesSinceJPressed, FramesSinceLPressed, PlayerX, PlayerY, LevelList);
+                }
+                else
+                {
+                    PlayerX = SlideCode(1, Convert.ToInt32((Convert.ToDouble(Speed) - 40)), FramesSinceJPressed, FramesSinceLPressed, PlayerX, PlayerY, LevelList);
+                }
 
                 if (Console.KeyAvailable || InputBuffer.ToArray().Length > 0)
                 {
@@ -162,6 +229,15 @@ namespace Text_Diver
                         KeyPressed = Console.ReadKey(true);
                     }
 
+                    if (KeyPressed.Modifiers == ConsoleModifiers.Shift)
+                    {
+                        MovementSpeed = 2;
+                    }
+                    else
+                    {
+                        MovementSpeed = 1;
+                    }
+
                     switch (KeyPressed.Key)
                     {
                         case ConsoleKey.I:
@@ -171,12 +247,30 @@ namespace Text_Diver
                             FramesSinceLPressed = 0;
                             break;
                         case ConsoleKey.J:
-                            PlayerX = ChangePlayerX(PlayerX, PlayerY, -1, LevelList);
+                            PlayerX = ChangePlayerX(PlayerX, PlayerY, -MovementSpeed, LevelList);
                             FramesSinceJPressed = 0;
                             break;
                         case ConsoleKey.L:
-                            PlayerX = ChangePlayerX(PlayerX, PlayerY, 1, LevelList);
+                            PlayerX = ChangePlayerX(PlayerX, PlayerY, MovementSpeed, LevelList);
                             FramesSinceLPressed = 0;
+                            break;
+                        case ConsoleKey.Z:
+                            if (IsBoosting == false)
+                            {
+                                Speed += 15;
+                                FramesSinceJPressed = 1000;
+                                FramesSinceLPressed = 1000;
+                                IsBoosting = true;
+                            }
+                            break;
+                        case ConsoleKey.X:
+                            if (IsBoosting == true)
+                            {
+                                Speed += -15;
+                                FramesSinceJPressed = 1000;
+                                FramesSinceLPressed = 1000;
+                                IsBoosting = false;
+                            }
                             break;
                         default:
                             break;
@@ -198,12 +292,138 @@ namespace Text_Diver
                     }
                 }
 
-                //Comment the following out to make the level end.
-                LevelList.Add("A                                                                                                  A");
+                ////Comment the following out to make the level end.
+                //LevelList.Add("A                                                                                                  A");
+
+                //if (WriteY - 50 > -1)
+                //{
+                //    Console.SetCursorPosition(0, WriteY - 50);
+                //}
+                //else
+                //{
+                //    Console.SetCursorPosition(0, WriteY);
+                //}
 
                 Console.SetCursorPosition(0, WriteY);
-                Thread.Sleep(50);
+
+                if (!((100 - Speed) < 1))
+                {
+                    Thread.Sleep(100 - Speed);
+                    TimeTaken += 100 - Speed;
+                }
             }
+            return LevelCompleted;
+        }
+
+        static void GameOverScreen(int WriteY)
+        {
+            if (WriteY - 50 > -1)
+            {
+                Console.SetCursorPosition(0, WriteY - 50);
+            }
+            else
+            {
+                Console.SetCursorPosition(0, 0);
+            }
+
+            WriteWithTransparancy("        ^^^    ^^^   ^ ^  ^^^^     ^^^  ^   ^ ^^^^  ^^^^              ^^^^^^^^                      ");
+            WriteWithTransparancy("       ^%%%^  ^%%%^ ^%^%^ %%%%^   ^%%%^^%^ ^%^%%%%^^%%%%^            ^^^%^^%^^^                     ");
+            WriteWithTransparancy("      ^%^^^^ ^%^^^%^%^%^%^%^^^   ^%^ ^%^%^ ^%^%^^  ^%^^^%^           ^^^%^^%^^^                     ");
+            WriteWithTransparancy("      ^%^^%%^^%%%%%^%^%^%^%%%^   ^%^ ^%^%^ ^%^%%%^ ^%%%%^            ^^^^^^^^^^                     ");
+            WriteWithTransparancy("      ^%^^^%^^%^^^%^%^ ^%^%^^    ^%^ ^%^^%^%^^%^^^^^%^^^%^           ^^%%%%%%^^                     ");
+            WriteWithTransparancy("       ^%%%^ ^%^ ^%^%^ ^%^%%%%%^  ^%%%^  ^%^ ^%%%%%^%^ ^%^           ^%^^^^^^%^                     ");
+            WriteWithTransparancy("        ^^^   ^   ^ ^   ^ ^^^^^    ^^^    ^   ^^^^^ ^   ^             ^^^^^^^^                      ");
+
+            DisplayContinueScreen("");
+        }
+
+        static void LevelComplete(int WriteY, string LevelName, double TimeTaken)
+        {
+            if (WriteY - 15 > -1)
+            {
+                Console.SetCursorPosition(0, WriteY - 15);
+            }
+            else
+            {
+                Console.SetCursorPosition(0, 0);
+            }
+
+            string[] HighScoreArray;
+            HighScoreArray = File.ReadAllLines("SaveData\\HighScores\\" + LevelName);
+            double HighScore = double.Parse(HighScoreArray[0]);
+
+            Console.WriteLine("                                                                                                    ");
+            Console.WriteLine("   Level Complete!                                                                                  ");
+            Console.WriteLine("                                                                                                    ");
+            Console.WriteLine($"                  Time: {TimeTaken}  ");
+            if (TimeTaken < HighScore)
+            {
+                Console.WriteLine("                                                        NEW RECORD!                                 ");
+                HighScoreArray[0] = TimeTaken.ToString();
+                File.WriteAllLines("SaveData\\HighScores\\" + LevelName, HighScoreArray);
+            }
+            else
+            {
+                Console.WriteLine($"                                                        Record: {HighScore}  ");
+            }
+            
+            Console.WriteLine("                                                                                                    ");
+            DisplayContinueScreen("");
+        }
+
+        static bool IsCollisionObjectOn(int Xpos, int Ypos, List<string> LevelList)
+        {
+            List<char> CollisionObjects = new List<char>();
+            CollisionObjects.Add('#');
+            CollisionObjects.Add('A');
+
+            bool IsCollisionObject;
+
+            char LevelChar;
+
+            try
+            {
+                LevelChar = LevelList[Ypos].ToArray()[Xpos];
+            }
+            catch (Exception)
+            {
+                LevelChar = '#';
+            }
+
+            if (CollisionObjects.Contains(LevelChar))
+            {
+                IsCollisionObject = true;
+            }
+            else
+            {
+                IsCollisionObject = false;
+            }
+            return IsCollisionObject;
+        }
+
+        static bool IsCharOn(int Xpos, int Ypos, List<string> LevelList, char Char)
+        {
+            bool IsCharAtPos;
+            char LevelChar;
+
+            try
+            {
+                LevelChar = LevelList[Ypos].ToArray()[Xpos];
+                if (LevelChar == Char)
+                {
+                    IsCharAtPos = true;
+                }
+                else
+                {
+                    IsCharAtPos = false;
+                }
+            }
+            catch (Exception)
+            {
+                IsCharAtPos = false;
+            }
+
+            return IsCharAtPos;
         }
 
         static int SlideCode(int Divisor, int Max, int FramesSinceJPressed, int FramesSinceLPressed, int PlayerX, int PlayerY, List<string> LevelList)
@@ -233,8 +453,7 @@ namespace Text_Diver
                 {
                     if (ChangeBy > 0)
                     {
-                        char LevelChar = LevelList[PlayerY].ToArray()[PlayerX + DistanceMoved];
-                        if (LevelChar == ' ')
+                        if (!IsCollisionObjectOn(PlayerX + 1, PlayerY, LevelList))
                         {
                             PlayerX += 1;
                         }
@@ -245,8 +464,7 @@ namespace Text_Diver
                     }
                     else if (ChangeBy < 0)
                     {
-                        char LevelChar = LevelList[PlayerY].ToArray()[PlayerX - DistanceMoved];
-                        if (LevelChar == ' ')
+                        if (!IsCollisionObjectOn(PlayerX - 1, PlayerY, LevelList))
                         {
                             PlayerX += -1;
                         }
@@ -258,6 +476,56 @@ namespace Text_Diver
                 }
             }
             return PlayerX;
+        }
+
+        static void DrawPlayerTrail(int PlayerX, int PlayerY, int PastPlayerX)
+        {
+            int Length = PastPlayerX - PlayerX;
+            for (int i = 0; i < Math.Abs(Length); i++)
+            {
+                if (Length < 0)
+                {
+                    AddStringAtPos("0", PastPlayerX + i, PlayerY - 1);
+                }
+                else
+                {
+                    AddStringAtPos("0", PastPlayerX - i, PlayerY - 1);
+                }
+            }
+            if (Length == 0)
+            {
+                AddStringAtPos("0", PastPlayerX, PlayerY - 1);
+            }
+        }
+
+        static void WriteWithTransparancy(string String)
+        {
+            char[] StringToArray = String.ToArray();
+            foreach (char Char in StringToArray)
+            {
+                if (!(Char == ' '))
+                {
+                    if (Char == '^')
+                    {
+                        Console.Write(" ");
+                    }
+                    else
+                    {
+                        Console.Write(Char);
+                    }
+                }
+                else
+                {
+                    try
+                    {
+                        Console.SetCursorPosition(Console.CursorLeft + 1, Console.CursorTop);
+                    }
+                    catch (Exception)
+                    {
+                        Console.SetCursorPosition(0, Console.CursorTop + 1);
+                    }
+                }
+            }
         }
 
         /// <summary>
